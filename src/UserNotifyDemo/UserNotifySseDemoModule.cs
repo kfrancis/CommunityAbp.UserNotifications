@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
+using UserNotifyDemo.Menus;
 using UserNotifySseDemo.Data;
 using UserNotifySseDemo.HealthChecks;
 using UserNotifySseDemo.Localization;

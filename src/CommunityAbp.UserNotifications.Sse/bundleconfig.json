@@ -1,0 +1,8 @@
+[
+  {
+    "outputFileName": "wwwroot/libs/communityabp/user-notifications/sse-client.min.js",
+    "inputFiles": [
+      "wwwroot/libs/communityabp/user-notifications/sse-client.js"
+    ]
+  }
+]

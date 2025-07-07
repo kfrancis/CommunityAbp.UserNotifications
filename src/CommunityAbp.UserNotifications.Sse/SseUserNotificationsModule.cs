@@ -1,4 +1,5 @@
 using CommunityAbp.UserNotifications.Abstractions;
+using CommunityAbp.UserNotifications.Sse.Pages.Components.SseScripts;
 using CommunityAbp.UserNotifications.Sse.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AspNetCore.Mvc;
@@ -32,8 +33,7 @@ public class SseUserNotificationsModule : AbpModule
         Configure<AbpLayoutHookOptions>(options => {
             options.Add(
                 LayoutHooks.Head.Last,
-                typeof(SseUserNotificationsModule),
-                "_SseScriptsPartial"
+                typeof(SseScriptsViewComponent)
             );
         });
     }

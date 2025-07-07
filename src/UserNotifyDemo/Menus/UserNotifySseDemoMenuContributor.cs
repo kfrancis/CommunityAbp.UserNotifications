@@ -1,13 +1,11 @@
-using UserNotifySseDemo.Permissions;
 using UserNotifySseDemo.Localization;
-using Volo.Abp.Authorization.Permissions;
+using UserNotifySseDemo.Menus;
 using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
-using Volo.Abp.UI.Navigation;
-using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.TenantManagement.Web.Navigation;
+using Volo.Abp.UI.Navigation;
 
-namespace UserNotifySseDemo.Menus;
+namespace UserNotifyDemo.Menus;
 
 public class UserNotifySseDemoMenuContributor : IMenuContributor
 {
