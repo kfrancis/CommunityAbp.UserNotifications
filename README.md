@@ -10,6 +10,11 @@ Currently supported transport mechanisms:
 - **Server-Sent Events (SSE)** - Lightweight, one-way communication from server to client
 - **SignalR** - Full-duplex communication between server and client
 
+## Background
+
+I was reading [this article](https://medium.com/@denmaklucky/you-dont-need-signalr-for-real-time-updates-server-sent-events-in-net-c-e032ff5d096e) and wanted to see if 
+we could make a notification system that is not tied to SignalR, but can use it if needed. We've already integrated SignalR for this notification purpose (like notifying a user when a report is ready), but I wanted to create a more modular and flexible system that allows for different transport mechanisms.
+
 ## Installation
 
 ### 1. Install the required packages
