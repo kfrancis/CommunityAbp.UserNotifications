@@ -1,0 +1,96 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+		<PreserveCompilationReferences>true</PreserveCompilationReferences>
+		<IsPackable>true</IsPackable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+		<PackageId>CommunityAbp.UserNotifications</PackageId>
+		<EnablePackageValidation>true</EnablePackageValidation>
+
+		<!-- Build Configuration -->
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+		<MinVerSkip>false</MinVerSkip>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DistributedLock.Redis" Version="1.0.3" />
+		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.6" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Roslynator.Analyzers" Version="4.13.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+		<PackageReference Include="Volo.Abp.Autofac" Version="9.2.1" />
+		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.1" />
+		<PackageReference Include="Volo.Abp.Core" Version="9.2.1" />
+		<PackageReference Include="Volo.Abp.DistributedLocking" Version="9.2.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+		<PackageReference Include="Volo.Abp.Account.Application">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.Account.HttpApi">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.Account.Web.OpenIddict">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server.LeptonXLiteTheme">
+			<Version>4.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Bundling">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Bundling.Abstractions">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite">
+			<Version>4.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AutoMapper">
+			<Version>9.2.1</Version>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.Swashbuckle">
+			<Version>9.2.1</Version>
+		</PackageReference>
+	</ItemGroup>
+
+
+</Project>

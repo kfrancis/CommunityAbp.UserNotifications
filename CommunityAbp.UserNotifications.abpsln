@@ -1,0 +1,16 @@
+{
+  "id": "adde33ef-8200-4547-87a1-afd4cb5ea839",
+  "template": "empty",
+  "options": {
+    "httpRequests": {
+      "ignoredUrls": [
+        "^/metrics$"
+      ]
+    }
+  },
+  "modules": {
+    "CommunityAbp.UserNotifications": {
+      "path": "communityabp.usernotifications/CommunityAbp.UserNotifications.abpmdl"
+    }
+  }
+}

@@ -1,0 +1,306 @@
+@page
+@model UserNotifySseDemo.Pages.Notifications.IndexModel
+@{
+    ViewData["Title"] = "Notifications Test";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>Notifications Test</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Send Notification</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="notificationForm">
+                                <div class="form-group mb-3">
+                                    <label for="message">Message</label>
+                                    <input type="text" class="form-control" id="message" value="This is a test notification">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="title">Title</label>
+                                    <input type="text" class="form-control" id="title" value="Test Notification">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="severity">Severity</label>
+                                    <select class="form-control" id="severity">
+                                        <option value="Info">Info</option>
+                                        <option value="Success">Success</option>
+                                        <option value="Warning">Warning</option>
+                                        <option value="Error">Error</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="target">Target</label>
+                                    <select class="form-control" id="target">
+                                        <option value="all">All Users</option>
+                                        <option value="user">Current User</option>
+                                        <option value="group">Group</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3" id="groupNameContainer" style="display: none;">
+                                    <label for="groupName">Group Name</label>
+                                    <input type="text" class="form-control" id="groupName" value="TestGroup">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="transportType">Transport</label>
+                                    <select class="form-control" id="transportType">
+                                        <option value="both">Both SSE & SignalR</option>
+                                        <option value="sse">SSE Only</option>
+                                        <option value="signalr">SignalR Only</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Notification</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Connection Status</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <strong>SSE:</strong> <span id="sseStatus" class="badge bg-secondary">Disconnected</span>
+                                <button id="sseConnect" class="btn btn-sm btn-primary">Connect</button>
+                                <button id="sseDisconnect" class="btn btn-sm btn-danger">Disconnect</button>
+                            </div>
+                            <div class="mb-2">
+                                <strong>SignalR:</strong> <span id="signalrStatus" class="badge bg-secondary">Disconnected</span>
+                                <button id="signalrConnect" class="btn btn-sm btn-primary">Connect</button>
+                                <button id="signalrDisconnect" class="btn btn-sm btn-danger">Disconnect</button>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Group:</strong>
+                                <input type="text" id="joinGroupName" value="TestGroup" class="form-control form-control-sm d-inline-block" style="width: 150px;">
+                                <button id="joinGroup" class="btn btn-sm btn-success">Join</button>
+                                <button id="leaveGroup" class="btn btn-sm btn-warning">Leave</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Received Notifications</h3>
+                            <button id="clearNotifications" class="btn btn-sm btn-secondary float-end">Clear</button>
+                        </div>
+                        <div class="card-body">
+                            <div id="notifications"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Show/hide group name field based on target selection
+        $('#target').change(function() {
+            if ($(this).val() === 'group') {
+                $('#groupNameContainer').show();
+            } else {
+                $('#groupNameContainer').hide();
+            }
+        });
+
+        // SSE Client
+        let sseClient = null;
+
+        $('#sseConnect').click(function() {
+            if (!sseClient) {
+                sseClient = abp.sseNotifications.createClient({
+                    onConnected: (connectionId, data) => {
+                        $('#sseStatus').removeClass('bg-secondary bg-danger').addClass('bg-success').text('Connected');
+                        addNotification('info', 'SSE Connected', `Connection ID: ${connectionId}`);
+                    },
+                    onDisconnected: () => {
+                        $('#sseStatus').removeClass('bg-success bg-danger').addClass('bg-secondary').text('Disconnected');
+                        addNotification('info', 'SSE Disconnected', '');
+                    },
+                    onError: (error) => {
+                        $('#sseStatus').removeClass('bg-success bg-secondary').addClass('bg-danger').text('Error');
+                        addNotification('error', 'SSE Connection Error', error.toString());
+                    }
+                });
+
+                // Listen for notifications
+                sseClient.on('notification', (data) => {
+                    addNotification(data.severity.toLowerCase(), data.title || 'Notification', data.message);
+                });
+            }
+
+            sseClient.connect().catch(error => {
+                console.error('SSE connection error:', error);
+                addNotification('error', 'SSE Connection Failed', error.toString());
+            });
+        });
+
+        $('#sseDisconnect').click(function() {
+            if (sseClient) {
+                sseClient.disconnect();
+            }
+        });
+
+        // SignalR Client
+        let signalrConnection = null;
+
+        $('#signalrConnect').click(async function() {
+            if (!signalrConnection) {
+                signalrConnection = new signalR.HubConnectionBuilder()
+                    .withUrl('/hubs/notifications')
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Listen for notifications
+                signalrConnection.on('notification', (data) => {
+                    addNotification(data.severity.toLowerCase(), data.title || 'Notification', data.message);
+                });
+
+                signalrConnection.onclose(() => {
+                    $('#signalrStatus').removeClass('bg-success bg-danger').addClass('bg-secondary').text('Disconnected');
+                    addNotification('info', 'SignalR Disconnected', '');
+                });
+            }
+
+            try {
+                await signalrConnection.start();
+                $('#signalrStatus').removeClass('bg-secondary bg-danger').addClass('bg-success').text('Connected');
+                addNotification('info', 'SignalR Connected', '');
+            } catch (err) {
+                $('#signalrStatus').removeClass('bg-success bg-secondary').addClass('bg-danger').text('Error');
+                addNotification('error', 'SignalR Connection Failed', err.toString());
+                console.error('SignalR connection error:', err);
+            }
+        });
+
+        $('#signalrDisconnect').click(async function() {
+            if (signalrConnection) {
+                await signalrConnection.stop();
+            }
+        });
+
+        // Group management
+        $('#joinGroup').click(async function() {
+            const groupName = $('#joinGroupName').val();
+
+            if (sseClient && sseClient.isConnected()) {
+                try {
+                    await sseClient.joinGroup(groupName);
+                    addNotification('success', 'SSE Group Joined', `Joined group: ${groupName}`);
+                } catch (err) {
+                    addNotification('error', 'SSE Join Group Failed', err.toString());
+                }
+            }
+
+            if (signalrConnection && signalrConnection.state === signalR.HubConnectionState.Connected) {
+                try {
+                    await signalrConnection.invoke('JoinGroup', groupName);
+                    addNotification('success', 'SignalR Group Joined', `Joined group: ${groupName}`);
+                } catch (err) {
+                    addNotification('error', 'SignalR Join Group Failed', err.toString());
+                }
+            }
+        });
+
+        $('#leaveGroup').click(async function() {
+            const groupName = $('#joinGroupName').val();
+
+            if (sseClient && sseClient.isConnected()) {
+                try {
+                    await sseClient.leaveGroup(groupName);
+                    addNotification('warning', 'SSE Group Left', `Left group: ${groupName}`);
+                } catch (err) {
+                    addNotification('error', 'SSE Leave Group Failed', err.toString());
+                }
+            }
+
+            if (signalrConnection && signalrConnection.state === signalR.HubConnectionState.Connected) {
+                try {
+                    await signalrConnection.invoke('LeaveGroup', groupName);
+                    addNotification('warning', 'SignalR Group Left', `Left group: ${groupName}`);
+                } catch (err) {
+                    addNotification('error', 'SignalR Leave Group Failed', err.toString());
+                }
+            }
+        });
+
+        // Send notification form
+        $('#notificationForm').submit(async function(e) {
+            e.preventDefault();
+
+            const message = $('#message').val();
+            const title = $('#title').val();
+            const severity = $('#severity').val();
+            const target = $('#target').val();
+            const groupName = $('#groupName').val();
+            const transportType = $('#transportType').val();
+
+            try {
+                let endpoint = '/api/notification-test/notify-all';
+                let data = { message, title, severity, transportType };
+
+                if (target === 'user') {
+                    endpoint = '/api/notification-test/notify-user';
+                } else if (target === 'group') {
+                    endpoint = '/api/notification-test/notify-group';
+                    data.groupName = groupName;
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    addNotification('success', 'Notification Sent', `Sent to ${target}`);
+                } else {
+                    const error = await response.text();
+                    addNotification('error', 'Failed to Send Notification', error);
+                }
+            } catch (err) {
+                addNotification('error', 'Failed to Send Notification', err.toString());
+            }
+        });
+
+        // Clear notifications
+        $('#clearNotifications').click(function() {
+            $('#notifications').empty();
+        });
+
+        // Helper to add notification to the UI
+        function addNotification(type, title, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const notificationHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <strong>${title}</strong> <small class="text-muted">${timestamp}</small>
+                    <br>${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            $('#notifications').prepend(notificationHtml);
+        }
+
+        // Initialize on page load
+        $(document).ready(function() {
+            // Auto connect when page loads
+            setTimeout(() => {
+                $('#sseConnect').click();
+                $('#signalrConnect').click();
+            }, 1000);
+        });
+    </script>
+}
