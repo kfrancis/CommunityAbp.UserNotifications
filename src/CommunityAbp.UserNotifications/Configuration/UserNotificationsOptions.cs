@@ -1,4 +1,4 @@
-﻿namespace CommunityAbp.UserNotifications.Configuration;
+namespace CommunityAbp.UserNotifications.Configuration;
 
 /// <summary>
 ///     Configuration options for user notifications, including settings for Server-Sent Events (SSE) connections.

@@ -1,6 +1,6 @@
 # CommunityAbp.UserNotifications
 
-A modular real-time user notification system for ABP.io applications that provides a flexible, transport-agnostic approach to sending notifications to clients.
+A modular real-time user notification system for [ABP.io](https://abp.io) applications that provides a flexible, transport-agnostic approach to sending notifications to clients.
 
 ## Overview
 
@@ -200,64 +200,6 @@ connection.invoke('LeaveGroup', 'Admins').then(() => {
 
 // Stop the connection when needed
 connection.stop();
-```
-
-## Angular Integration
-
-For Angular applications, you can use the provided service wrapper:
-
-```typescript
-// app.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { SseNotificationsService } from './sse-notifications.service';
-import { Subscription } from 'rxjs';
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <div *ngIf="lastNotification">
-      <div class="alert alert-{{lastNotification.severity}}">
-        <strong>{{lastNotification.title}}</strong>
-        <p>{{lastNotification.message}}</p>
-      </div>
-    </div>
-  `
-})
-export class AppComponent implements OnInit, OnDestroy {
-  lastNotification: any = null;
-  private subscription: Subscription;
-  
-  constructor(private notificationsService: SseNotificationsService) {}
-  
-  ngOnInit() {
-    // Connect to SSE
-    this.notificationsService.connect();
-    
-    // Subscribe to notifications
-    this.subscription = this.notificationsService.onNotification()
-      .subscribe(notification => {
-        this.lastNotification = notification;
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          if (this.lastNotification === notification) {
-            this.lastNotification = null;
-          }
-        }, 5000);
-      });
-      
-    // Join a group if needed
-    this.notificationsService.joinGroup('Users');
-  }
-  
-  ngOnDestroy() {
-    // Clean up subscriptions and disconnect
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.notificationsService.disconnect();
-  }
-}
 ```
 
 ## Configuration Options

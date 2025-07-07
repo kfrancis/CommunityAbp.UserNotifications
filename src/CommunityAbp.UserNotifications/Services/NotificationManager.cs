@@ -1,152 +1,151 @@
-﻿using CommunityAbp.UserNotifications.Abstractions;
+using CommunityAbp.UserNotifications.Abstractions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
 
-namespace CommunityAbp.UserNotifications.Services
+namespace CommunityAbp.UserNotifications.Services;
+
+/// <summary>
+///     Manages sending notifications to users, groups, or all connected clients.
+/// </summary>
+[UsedImplicitly]
+public class NotificationManager : INotificationManager, ITransientDependency
 {
+    private readonly ILogger<NotificationManager> _logger;
+    private readonly IServiceProvider _serviceProvider;
+
     /// <summary>
-    ///     Manages sending notifications to users, groups, or all connected clients.
+    ///     Initializes a new instance of the <see cref="NotificationManager" /> class.
     /// </summary>
-    [UsedImplicitly]
-    public class NotificationManager : INotificationManager, ITransientDependency
+    /// <param name="serviceProvider">
+    ///     The service provider to resolve dependencies for notification senders.
+    /// </param>
+    /// <param name="logger">
+    ///     The logger to log errors and information during notification sending.
+    /// </param>
+    public NotificationManager(
+        IServiceProvider serviceProvider,
+        ILogger<NotificationManager> logger)
     {
-        private readonly ILogger<NotificationManager> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+    }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="NotificationManager" /> class.
-        /// </summary>
-        /// <param name="serviceProvider">
-        ///     The service provider to resolve dependencies for notification senders.
-        /// </param>
-        /// <param name="logger">
-        ///     The logger to log errors and information during notification sending.
-        /// </param>
-        public NotificationManager(
-            IServiceProvider serviceProvider,
-            ILogger<NotificationManager> logger)
+    /// <summary>
+    ///     Sends a notification to all connected users with the specified message, severity, and optional title.
+    /// </summary>
+    /// <param name="message">
+    ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
+    /// </param>
+    /// <param name="severity">
+    ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
+    /// </param>
+    /// <param name="title">
+    ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
+    /// </param>
+    public async Task NotifyAllAsync(string message, NotificationSeverity severity = NotificationSeverity.Info,
+        string? title = null)
+    {
+        var data = new NotificationData
         {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-        }
+            Message = message,
+            Severity = severity,
+            Title = title
+        };
 
-        /// <summary>
-        ///     Sends a notification to all connected users with the specified message, severity, and optional title.
-        /// </summary>
-        /// <param name="message">
-        ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
-        /// </param>
-        /// <param name="severity">
-        ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
-        /// </param>
-        /// <param name="title">
-        ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
-        /// </param>
-        public async Task NotifyAllAsync(string message, NotificationSeverity severity = NotificationSeverity.Info,
-            string? title = null)
+        await SendEventAsync("notification", data);
+    }
+
+    /// <summary>
+    ///     Sends a notification to a specific user identified by their user ID.
+    /// </summary>
+    /// <param name="userId">
+    ///     The unique identifier of the user to whom the notification should be sent.
+    /// </param>
+    /// <param name="message">
+    ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
+    /// </param>
+    /// <param name="severity">
+    ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
+    /// </param>
+    /// <param name="title">
+    ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
+    /// </param>
+    public async Task NotifyUserAsync(string userId, string message,
+        NotificationSeverity severity = NotificationSeverity.Info, string? title = null)
+    {
+        var data = new NotificationData
         {
-            var data = new NotificationData
+            Message = message,
+            Severity = severity,
+            Title = title
+        };
+
+        await SendEventAsync("notification", data, userId);
+    }
+
+    /// <summary>
+    ///     Sends a notification to a specific group of users identified by the group name.
+    /// </summary>
+    /// <param name="groupName">
+    ///     The name of the group to which the notification should be sent. This allows for targeted notifications to specific
+    ///     user groups.
+    /// </param>
+    /// <param name="message">
+    ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
+    /// </param>
+    /// <param name="severity">
+    ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
+    /// </param>
+    /// <param name="title">
+    ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
+    /// </param>
+    public async Task NotifyGroupAsync(string groupName, string message,
+        NotificationSeverity severity = NotificationSeverity.Info, string? title = null)
+    {
+        var data = new NotificationData
+        {
+            Message = message,
+            Severity = severity,
+            Title = title
+        };
+
+        await SendEventAsync("notification", data, null, groupName);
+    }
+
+    /// <summary>
+    ///     Sends a custom event with data to all connected users, or optionally to a specific user or group.
+    /// </summary>
+    /// <param name="eventName">
+    ///     The name of the event to send. This will be used by the client to handle the event appropriately.
+    /// </param>
+    /// <param name="data">
+    ///     The data to send with the event. This can be any serializable object that the client can process.
+    /// </param>
+    /// <param name="userId">
+    ///     Optional user ID to send the event to a specific user. If null, the event will be sent to all users.
+    /// </param>
+    /// <param name="groupName">
+    ///     Optional group name to send the event to a specific group of users. If null, the event will be sent to all users.
+    /// </param>
+    public async Task SendEventAsync(string eventName, object data, string? userId = null, string? groupName = null)
+    {
+        // Get all registered notification senders
+        foreach (var sender in _serviceProvider.GetServices<INotificationSender>())
+        {
+            try
             {
-                Message = message,
-                Severity = severity,
-                Title = title
-            };
-
-            await SendEventAsync("notification", data);
-        }
-
-        /// <summary>
-        ///     Sends a notification to a specific user identified by their user ID.
-        /// </summary>
-        /// <param name="userId">
-        ///     The unique identifier of the user to whom the notification should be sent.
-        /// </param>
-        /// <param name="message">
-        ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
-        /// </param>
-        /// <param name="severity">
-        ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
-        /// </param>
-        /// <param name="title">
-        ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
-        /// </param>
-        public async Task NotifyUserAsync(string userId, string message,
-            NotificationSeverity severity = NotificationSeverity.Info, string? title = null)
-        {
-            var data = new NotificationData
+                if (!string.IsNullOrEmpty(userId))
+                    await sender.SendToUserAsync(userId, eventName, data);
+                else if (!string.IsNullOrEmpty(groupName))
+                    await sender.SendToGroupAsync(groupName, eventName, data);
+                else
+                    await sender.SendToAllAsync(eventName, data);
+            }
+            catch (Exception ex)
             {
-                Message = message,
-                Severity = severity,
-                Title = title
-            };
-
-            await SendEventAsync("notification", data, userId);
-        }
-
-        /// <summary>
-        ///     Sends a notification to a specific group of users identified by the group name.
-        /// </summary>
-        /// <param name="groupName">
-        ///     The name of the group to which the notification should be sent. This allows for targeted notifications to specific
-        ///     user groups.
-        /// </param>
-        /// <param name="message">
-        ///     The message to send in the notification. This should be a user-friendly string that describes the notification.
-        /// </param>
-        /// <param name="severity">
-        ///     The severity level of the notification, which can be used to indicate the importance or urgency of the message.
-        /// </param>
-        /// <param name="title">
-        ///     An optional title for the notification. If provided, this will be displayed prominently in the notification UI.
-        /// </param>
-        public async Task NotifyGroupAsync(string groupName, string message,
-            NotificationSeverity severity = NotificationSeverity.Info, string? title = null)
-        {
-            var data = new NotificationData
-            {
-                Message = message,
-                Severity = severity,
-                Title = title
-            };
-
-            await SendEventAsync("notification", data, null, groupName);
-        }
-
-        /// <summary>
-        ///     Sends a custom event with data to all connected users, or optionally to a specific user or group.
-        /// </summary>
-        /// <param name="eventName">
-        ///     The name of the event to send. This will be used by the client to handle the event appropriately.
-        /// </param>
-        /// <param name="data">
-        ///     The data to send with the event. This can be any serializable object that the client can process.
-        /// </param>
-        /// <param name="userId">
-        ///     Optional user ID to send the event to a specific user. If null, the event will be sent to all users.
-        /// </param>
-        /// <param name="groupName">
-        ///     Optional group name to send the event to a specific group of users. If null, the event will be sent to all users.
-        /// </param>
-        public async Task SendEventAsync(string eventName, object data, string? userId = null, string? groupName = null)
-        {
-            // Get all registered notification senders
-            foreach (var sender in _serviceProvider.GetServices<INotificationSender>())
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(userId))
-                        await sender.SendToUserAsync(userId, eventName, data);
-                    else if (!string.IsNullOrEmpty(groupName))
-                        await sender.SendToGroupAsync(groupName, eventName, data);
-                    else
-                        await sender.SendToAllAsync(eventName, data);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error sending notification through {SenderType}", sender.GetType().Name);
-                }
+                _logger.LogError(ex, "Error sending notification through {SenderType}", sender.GetType().Name);
             }
         }
     }
