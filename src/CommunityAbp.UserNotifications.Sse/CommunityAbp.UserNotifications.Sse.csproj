@@ -5,6 +5,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
+    <PackageId>CommunityAbp.UserNotifications.Sse</PackageId>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <Version>1.0.0</Version>
+    <Authors>Kori Francis</Authors>
+    <Company>Clinical Support Systems</Company>
+    <Description>Server-Sent Events (SSE) implementation for CommunityAbp.UserNotifications providing lightweight, one-way real-time notifications from server to client.</Description>
+    <PackageTags>abp;notifications;sse;server-sent-events;realtime;communityabp</PackageTags>
+    <PackageProjectUrl>https://github.com/kfrancis/CommunityAbp.UserNotifications</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kfrancis/CommunityAbp.UserNotifications</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
 		<!-- Build Configuration -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
@@ -12,6 +25,10 @@
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<!-- Include TypeScript files but don't publish them -->

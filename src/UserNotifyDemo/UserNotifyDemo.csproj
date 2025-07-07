@@ -128,7 +128,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CommunityAbp.UserNotifications.Sse\CommunityAbp.UserNotifications.Sse.csproj" />
+    <ProjectReference Include="..\CommunityAbp.UserNotifications.SignalR\CommunityAbp.UserNotifications.SignalR.csproj" />
+    <ProjectReference Include="..\CommunityAbp.UserNotifications.Sse\CommunityAbp.UserNotifications.Sse.csproj" />
   </ItemGroup>
 
 </Project>

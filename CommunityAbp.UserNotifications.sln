@@ -11,11 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityAbp.UserNotificati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6C4D298B-81FB-2B6B-5AB6-46205EDDC72C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5D20AA90-6969-D8BD-9DCD-8634F4692FDA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserNotifySseDemo", "src\samples\UserNotifySseDemo\UserNotifySseDemo.csproj", "{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserNotifySignalRDemo", "src\samples\UserNotifySignalRDemo\UserNotifySignalRDemo.csproj", "{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{4F9DEAE5-078F-E77A-2E4A-FEB6FFE226FF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{089100B1-113F-4E66-888A-E83F3999EAFD}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,7 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		common.props = common.props
 		NuGet.Config = NuGet.Config
+		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserNotifyDemo", "src\UserNotifyDemo\UserNotifyDemo.csproj", "{DFF25121-38E7-5C10-84B3-FF97A533ABBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +42,10 @@ Global
 		{01EBAAF9-3917-4754-81FA-080106F94586}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01EBAAF9-3917-4754-81FA-080106F94586}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01EBAAF9-3917-4754-81FA-080106F94586}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF25121-38E7-5C10-84B3-FF97A533ABBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF25121-38E7-5C10-84B3-FF97A533ABBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF25121-38E7-5C10-84B3-FF97A533ABBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF25121-38E7-5C10-84B3-FF97A533ABBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,8 +54,7 @@ Global
 		{9F34C3C5-15BA-4E7B-84A7-FA3416C06D0F} = {6C4D298B-81FB-2B6B-5AB6-46205EDDC72C}
 		{67ECC80A-AB8A-404B-BEE4-3E5B8284D321} = {6C4D298B-81FB-2B6B-5AB6-46205EDDC72C}
 		{01EBAAF9-3917-4754-81FA-080106F94586} = {6C4D298B-81FB-2B6B-5AB6-46205EDDC72C}
-		{80C6B5C2-F4D5-8551-EC8F-9FCA440AE81E} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
-		{7291DC36-3C5E-F7E4-BDC3-313BD0D3C88E} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+		{DFF25121-38E7-5C10-84B3-FF97A533ABBA} = {4F9DEAE5-078F-E77A-2E4A-FEB6FFE226FF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {439EB13F-EEDF-47EE-AE8F-5BAC8C3061BF}

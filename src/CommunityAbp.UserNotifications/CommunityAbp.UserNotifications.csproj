@@ -13,8 +13,19 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningsAsErrors />
 		<WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
-		<PackageId>CommunityAbp.UserNotifications</PackageId>
-		<EnablePackageValidation>true</EnablePackageValidation>
+
+    <PackageId>CommunityAbp.UserNotifications</PackageId>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <Version>1.0.0</Version>
+    <Authors>Kori Francis</Authors>
+    <Company>Clinical Support Systems</Company>
+    <Description>Core notification management abstractions for ABP.io applications with flexible transport-agnostic architecture for real-time client notifications.</Description>
+    <PackageTags>abp;notifications;realtime;messaging;communityabp</PackageTags>
+    <PackageProjectUrl>https://github.com/kfrancis/CommunityAbp.UserNotifications</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kfrancis/CommunityAbp.UserNotifications</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
 		<!-- Build Configuration -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -23,6 +34,10 @@
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 	<PropertyGroup>
 		<MinVerTagPrefix>v</MinVerTagPrefix>

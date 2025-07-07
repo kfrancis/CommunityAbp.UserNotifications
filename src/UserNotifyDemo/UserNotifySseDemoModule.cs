@@ -1,15 +1,16 @@
 using CommunityAbp.UserNotifications.SignalR;
+using CommunityAbp.UserNotifications.Sse;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
-using UserNotifySignalRDemo.Data;
-using UserNotifySignalRDemo.HealthChecks;
-using UserNotifySignalRDemo.Localization;
-using UserNotifySignalRDemo.Menus;
-using UserNotifySignalRDemo.Permissions;
+using UserNotifySseDemo.Data;
+using UserNotifySseDemo.HealthChecks;
+using UserNotifySseDemo.Localization;
+using UserNotifySseDemo.Menus;
+using UserNotifySseDemo.Permissions;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
@@ -61,7 +62,7 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
-namespace UserNotifySignalRDemo;
+namespace UserNotifySseDemo;
 
 [DependsOn(
     // ABP Framework packages
@@ -120,10 +121,11 @@ namespace UserNotifySignalRDemo;
     typeof(BlobStoringDatabaseEntityFrameworkCoreModule),
     typeof(AbpEntityFrameworkCoreSqlServerModule),
 
-    // SignalR module for user notifications
+    // User Notifications modules
+    typeof(SseUserNotificationsModule),
     typeof(SignalrUserNotificationsModule)
 )]
-public class UserNotifySignalRDemoModule : AbpModule
+public class UserNotifySseDemoModule : AbpModule
 {
     /* Single point to enable/disable multi-tenancy */
     public const bool IsMultiTenant = true;
@@ -136,7 +138,7 @@ public class UserNotifySignalRDemoModule : AbpModule
         context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
         {
             options.AddAssemblyResource(
-                typeof(UserNotifySignalRDemoResource)
+                typeof(UserNotifySseDemoResource)
             );
         });
 
@@ -144,7 +146,7 @@ public class UserNotifySignalRDemoModule : AbpModule
         {
             builder.AddValidation(options =>
             {
-                options.AddAudiences("UserNotifySignalRDemo");
+                options.AddAudiences("UserNotifySseDemo");
                 options.UseLocalServer();
                 options.UseAspNetCore();
             });
@@ -163,9 +165,9 @@ public class UserNotifySignalRDemoModule : AbpModule
             });
         }
 
-        UserNotifySignalRDemoGlobalFeatureConfigurator.Configure();
-        UserNotifySignalRDemoModuleExtensionConfigurator.Configure();
-        UserNotifySignalRDemoEfCoreEntityExtensionMappings.Configure();
+        UserNotifySseDemoGlobalFeatureConfigurator.Configure();
+        UserNotifySseDemoModuleExtensionConfigurator.Configure();
+        UserNotifySseDemoEfCoreEntityExtensionMappings.Configure();
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -194,7 +196,7 @@ public class UserNotifySignalRDemoModule : AbpModule
 
     private void ConfigureHealthChecks(ServiceConfigurationContext context)
     {
-        context.Services.AddUserNotifySignalRDemoHealthChecks();
+        context.Services.AddUserNotifySseDemoHealthChecks();
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -249,11 +251,11 @@ public class UserNotifySignalRDemoModule : AbpModule
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources
-                .Add<UserNotifySignalRDemoResource>("en")
+                .Add<UserNotifySseDemoResource>("en")
                 .AddBaseTypes(typeof(AbpValidationResource))
-                .AddVirtualJson("/Localization/UserNotifySignalRDemo");
+                .AddVirtualJson("/Localization/UserNotifySseDemo");
 
-            options.DefaultResourceType = typeof(UserNotifySignalRDemoResource);
+            options.DefaultResourceType = typeof(UserNotifySseDemoResource);
             
             options.Languages.Add(new LanguageInfo("en", "en", "English")); 
             options.Languages.Add(new LanguageInfo("en-GB", "en-GB", "English (United Kingdom)")); 
@@ -280,7 +282,7 @@ public class UserNotifySignalRDemoModule : AbpModule
 
         Configure<AbpExceptionLocalizationOptions>(options =>
         {
-            options.MapCodeNamespace("UserNotifySignalRDemo", typeof(UserNotifySignalRDemoResource));
+            options.MapCodeNamespace("UserNotifySseDemo", typeof(UserNotifySseDemoResource));
         });
     }
 
@@ -288,11 +290,11 @@ public class UserNotifySignalRDemoModule : AbpModule
     {
         Configure<AbpVirtualFileSystemOptions>(options =>
         {
-            options.FileSets.AddEmbedded<UserNotifySignalRDemoModule>();
+            options.FileSets.AddEmbedded<UserNotifySseDemoModule>();
             if (hostingEnvironment.IsDevelopment())
             {
                 /* Using physical files in development, so we don't need to recompile on changes */
-                options.FileSets.ReplaceEmbeddedByPhysical<UserNotifySignalRDemoModule>(hostingEnvironment.ContentRootPath);
+                options.FileSets.ReplaceEmbeddedByPhysical<UserNotifySseDemoModule>(hostingEnvironment.ContentRootPath);
             }
         });
     }
@@ -301,7 +303,7 @@ public class UserNotifySignalRDemoModule : AbpModule
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
-            options.ConventionalControllers.Create(typeof(UserNotifySignalRDemoModule).Assembly);
+            options.ConventionalControllers.Create(typeof(UserNotifySseDemoModule).Assembly);
         });
     }
 
@@ -310,7 +312,7 @@ public class UserNotifySignalRDemoModule : AbpModule
         services.AddAbpSwaggerGen(
             options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "UserNotifySignalRDemo API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "UserNotifySseDemo API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
             }
@@ -319,14 +321,14 @@ public class UserNotifySignalRDemoModule : AbpModule
 
     private void ConfigureAutoMapper(ServiceConfigurationContext context)
     {
-        context.Services.AddAutoMapperObjectMapper<UserNotifySignalRDemoModule>();
+        context.Services.AddAutoMapperObjectMapper<UserNotifySseDemoModule>();
         Configure<AbpAutoMapperOptions>(options =>
         {
             /* Uncomment `validate: true` if you want to enable the Configuration Validation feature.
              * See AutoMapper's documentation to learn what it is:
              * https://docs.automapper.org/en/stable/Configuration-validation.html
              */
-            options.AddMaps<UserNotifySignalRDemoModule>(/* validate: true */);
+            options.AddMaps<UserNotifySseDemoModule>(/* validate: true */);
         });
     }
 
@@ -335,18 +337,18 @@ public class UserNotifySignalRDemoModule : AbpModule
     {
         Configure<AbpNavigationOptions>(options =>
         {
-            options.MenuContributors.Add(new UserNotifySignalRDemoMenuContributor());
+            options.MenuContributors.Add(new UserNotifySseDemoMenuContributor());
         });
 
         Configure<AbpToolbarOptions>(options =>
         {
-            options.Contributors.Add(new UserNotifySignalRDemoToolbarContributor());
+            options.Contributors.Add(new UserNotifySseDemoToolbarContributor());
         });
     }
     
     private void ConfigureEfCore(ServiceConfigurationContext context)
     {
-        context.Services.AddAbpDbContext<UserNotifySignalRDemoDbContext>(options =>
+        context.Services.AddAbpDbContext<UserNotifySseDemoDbContext>(options =>
         {
             /* You can remove "includeAllEntities: true" to create
              * default repositories only for aggregate roots
@@ -403,7 +405,7 @@ public class UserNotifySignalRDemoModule : AbpModule
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "UserNotifySignalRDemo API");
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "UserNotifySseDemo API");
         });
 
         app.UseAuditing();
